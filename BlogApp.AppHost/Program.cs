@@ -12,11 +12,6 @@ builder.AddProject<Projects.BlogApp_Web>("webfrontend")
     .WithReference(apiService);
 
 // Add the Razor server project
-var razorServer = builder.AddProject<Projects.BlogServer>("razorserver");
-
-
-var api = builder.AddProject<Projects.BlogApp_ApiService>("backend")
-    .WithReference(sql)
-    .WaitFor(sql); 
+var razorServer = builder.AddProject<Projects.BlogServer>("blazorserver");
 
 builder.Build().Run();
