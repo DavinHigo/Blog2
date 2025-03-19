@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperBlogger.AppHost", "SuperBlogger.AppHost\SuperBlogger.AppHost.csproj", "{506FD355-8196-4142-83B2-C1ED82CAE04C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperBlogger.ServiceDefaults", "SuperBlogger.ServiceDefaults\SuperBlogger.ServiceDefaults.csproj", "{48E86871-6599-442D-AA40-9032EA0DE63C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperBlogger.ApiService", "SuperBlogger.ApiService\SuperBlogger.ApiService.csproj", "{68840202-415E-496E-8B29-3AC96C031E14}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperBlogger.Web", "SuperBlogger.Web\SuperBlogger.Web.csproj", "{49A45E05-5F05-433E-ACDA-6EC29FA24539}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BloggerLibrary", "BloggerLibrary\BloggerLibrary.csproj", "{822FCDBE-EA6F-4A69-87E6-10F3F51CC8E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BloggerBlazorServer", "BloggerBlazorServer\BloggerBlazorServer.csproj", "{4BE78B31-F0B9-42B3-B3C5-E18E1CB1F9B5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{506FD355-8196-4142-83B2-C1ED82CAE04C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{506FD355-8196-4142-83B2-C1ED82CAE04C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{506FD355-8196-4142-83B2-C1ED82CAE04C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{506FD355-8196-4142-83B2-C1ED82CAE04C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48E86871-6599-442D-AA40-9032EA0DE63C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48E86871-6599-442D-AA40-9032EA0DE63C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48E86871-6599-442D-AA40-9032EA0DE63C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48E86871-6599-442D-AA40-9032EA0DE63C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68840202-415E-496E-8B29-3AC96C031E14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68840202-415E-496E-8B29-3AC96C031E14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68840202-415E-496E-8B29-3AC96C031E14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68840202-415E-496E-8B29-3AC96C031E14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49A45E05-5F05-433E-ACDA-6EC29FA24539}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49A45E05-5F05-433E-ACDA-6EC29FA24539}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49A45E05-5F05-433E-ACDA-6EC29FA24539}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49A45E05-5F05-433E-ACDA-6EC29FA24539}.Release|Any CPU.Build.0 = Release|Any CPU
+		{822FCDBE-EA6F-4A69-87E6-10F3F51CC8E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{822FCDBE-EA6F-4A69-87E6-10F3F51CC8E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{822FCDBE-EA6F-4A69-87E6-10F3F51CC8E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{822FCDBE-EA6F-4A69-87E6-10F3F51CC8E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BE78B31-F0B9-42B3-B3C5-E18E1CB1F9B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BE78B31-F0B9-42B3-B3C5-E18E1CB1F9B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BE78B31-F0B9-42B3-B3C5-E18E1CB1F9B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BE78B31-F0B9-42B3-B3C5-E18E1CB1F9B5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,112 @@
+@page "/admin"
+
+@using BloggerBlazorServer.Data
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Components.Forms
+
+<PageTitle>Admin Page</PageTitle>
+
+<h3>Admin Page</h3>
+
+@if (users is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in users)
+            {
+                <tr>
+                    <td>@user.Email</td>
+                    <td>@user.FirstName</td>
+                    <td>@user.LastName</td>
+                    <td>@user.Role</td>
+                    <td>
+                        <EditForm EditContext="new EditContext(user)" OnValidSubmit="() => ChangeRole(user.Id)" FormName=@($"ChangeRoleForm_{user.Id}")>
+                            <button type="submit" class="btn btn-primary">Change Role</button>
+                        </EditForm>
+                        @if (!user.IsAuth)
+                        {
+                            <EditForm EditContext="new EditContext(user)" OnValidSubmit="() => AuthorizeUser(user.Id)" FormName=@($"AuthorizeUserForm_{user.Id}")>
+                                <button type="submit" class="btn btn-success">Authorize</button>
+                            </EditForm>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<ApplicationUser>? users;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine($"Base URI: {Navigation.BaseUri}");
+        try
+        {
+            users = await Http.GetFromJsonAsync<List<ApplicationUser>>($"{Navigation.BaseUri}api/User");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    private async Task ChangeRole(string userId)
+    {
+        Console.WriteLine($"Changing role for user {userId}");
+        try
+        {
+            var response = await Http.PostAsync($"{Navigation.BaseUri}api/User/ChangeRole/{userId}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                users = await Http.GetFromJsonAsync<List<ApplicationUser>>($"{Navigation.BaseUri}api/User");
+            }
+            else
+            {
+                errorMessage = "Failed to change role.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    private async Task AuthorizeUser(string userId)
+    {
+        Console.WriteLine($"Authorizing user {userId}");
+        try
+        {
+            var response = await Http.PostAsync($"{Navigation.BaseUri}api/User/Authorize/{userId}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                users = await Http.GetFromJsonAsync<List<ApplicationUser>>($"{Navigation.BaseUri}api/User");
+            }
+            else
+            {
+                errorMessage = "Failed to authorize user.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+}
