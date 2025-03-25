@@ -18,6 +18,7 @@
     private Article newArticle = new();
     private string? userName;
     private bool isSubmitting = false;
+     private string? errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
@@ -44,6 +45,12 @@
         
         try
         {
+            if (newArticle!.StartDate > newArticle.EndDate)
+            {
+                errorMessage = "Start Date must be the same day or earlier than End Date.";
+                return;
+            }
+
             newArticle.CreateDate = DateTime.UtcNow;
             await ArticleService.CreateArticleAsync(newArticle);
             Navigation.NavigateTo("/auth");
@@ -62,6 +69,11 @@
         <EditForm Model="@newArticle" OnValidSubmit="@HandleValidSubmit" FormName="createArticleForm">
             <DataAnnotationsValidator />
             <ValidationSummary />
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="text-danger mb-3">@errorMessage</div>
+            }
 
             <div class="mb-3">
                 <label for="title" class="form-label">Title</label>

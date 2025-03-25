@@ -36,9 +36,16 @@
     private async Task HandleValidSubmit()
     {
         isSubmitting = true;
+        errorMessage = null;
 
         try
         {
+            if (articleToEdit!.StartDate > articleToEdit.EndDate)
+            {
+                errorMessage = "Start Date must be the same day or earlier than End Date.";
+                return;
+            }
+
             await ArticleService.UpdateArticleAsync(articleToEdit!);
             Navigation.NavigateTo("/auth");
         }
@@ -53,18 +60,19 @@
     }
 }
 
-@if (errorMessage != null)
-{
-    <div class="alert alert-danger">@errorMessage</div>
-}
-else if (articleToEdit != null)
-{
-    <div class="edit-article-wrapper">
-        <div class="edit-article-box">
-            <h1>Edit Article</h1>
+<div class="edit-article-wrapper">
+    <div class="edit-article-box">
+        <h1>Edit Article</h1>
+        @if (articleToEdit != null)
+        {
             <EditForm Model="@articleToEdit" OnValidSubmit="@HandleValidSubmit" FormName="editArticleForm">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
+
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="text-danger mb-3">@errorMessage</div>
+                }
 
                 <div class="mb-3">
                     <label for="title" class="form-label">Title</label>
@@ -91,7 +99,7 @@ else if (articleToEdit != null)
                 </div>
 
                 <div class="mb-3">
-                    <label for="contributorUsername" class="form-label">Contributor Username</label>
+                    <label for="contributorUsername" class="form-label">Contributor</label>
                     <InputText id="contributorUsername" class="form-control" @bind-Value="@articleToEdit.ContributorUsername" readonly />
                 </div>
 
@@ -107,7 +115,10 @@ else if (articleToEdit != null)
                     }
                 </button>
             </EditForm>
-        </div>
+        }
+        else
+        {
+            <div class="alert alert-danger">Article not found.</div>
+        }
     </div>
-}
-
+</div>
