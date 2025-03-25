@@ -1,72 +1,114 @@
 @page "/admin"
-
 @using BloggerBlazorServer.Data
 @using System.Net.Http.Json
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@rendermode InteractiveServer
 @using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.QuickGrid
 
 <PageTitle>Admin Page</PageTitle>
 
 <h3>Admin Page</h3>
 
-@if (users is null)
+@if (errorMessage != null)
 {
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Email</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Role</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in users)
-            {
-                <tr>
-                    <td>@user.Email</td>
-                    <td>@user.FirstName</td>
-                    <td>@user.LastName</td>
-                    <td>@user.Role</td>
-                    <td>
-                        <EditForm EditContext="new EditContext(user)" OnValidSubmit="() => ChangeRole(user.Id)" FormName=@($"ChangeRoleForm_{user.Id}")>
-                            <button type="submit" class="btn btn-primary">Change Role</button>
-                        </EditForm>
-                        @if (!user.IsAuth)
-                        {
-                            <EditForm EditContext="new EditContext(user)" OnValidSubmit="() => AuthorizeUser(user.Id)" FormName=@($"AuthorizeUserForm_{user.Id}")>
-                                <button type="submit" class="btn btn-success">Authorize</button>
-                            </EditForm>
-                        }
-                        else
-                        {
-                            <EditForm EditContext="new EditContext(user)" OnValidSubmit="() => DeauthorizeUser(user.Id)" FormName=@($"DeauthorizeUserForm_{user.Id}")>
-                                <button type="submit" class="btn btn-danger">Deauthorize</button>
-                            </EditForm>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="alert alert-danger">@errorMessage</div>
 }
 
+<div class="page-size-chooser">
+    Items per page:
+    <select @bind="@pagination.ItemsPerPage">
+        <option>5</option>
+        <option>10</option>
+        <option>20</option>
+        <option>50</option>
+    </select>
+</div>
+
+<div class="grid">
+    <QuickGrid Items="@FilteredUsers" Pagination="@pagination">
+        <PropertyColumn Property="@(c => c.Email)" Sortable="true">
+            <ColumnOptions>
+                <div class="search-box">
+                    <input type="search" autofocus @bind="emailFilter" @bind:event="oninput" placeholder="Email" />
+                </div>
+            </ColumnOptions>
+        </PropertyColumn>
+        <PropertyColumn Property="@(c => c.FirstName)" Sortable="true" />
+        <PropertyColumn Property="@(c => c.LastName)" Sortable="true" />
+        <PropertyColumn Property="@(c => c.Role)" Sortable="true">
+            <ColumnOptions>
+                <div class="search-box">
+                    <input type="search" autofocus @bind="roleFilter" @bind:event="oninput" placeholder="Role" />
+                </div>
+            </ColumnOptions>
+        </PropertyColumn>
+        <TemplateColumn>
+            <div class="button-group">
+                <button @onclick="@(() => ChangeRole(context.Id))" class="btn btn-primary">Change Role</button>
+                @if (!context.IsAuth)
+                {
+                    <button @onclick="@(() => AuthorizeUser(context.Id))" class="btn btn-success">Authorize</button>
+                }
+                else
+                {
+                    <button @onclick="@(() => DeauthorizeUser(context.Id))" class="btn btn-danger">Deauthorize</button>
+                }
+            </div>
+        </TemplateColumn>
+    </QuickGrid>
+</div>
+
+<Paginator State="@pagination" />
+
 @code {
+    private PaginationState pagination = new() { ItemsPerPage = 10 };
+    private IQueryable<ApplicationUser>? itemsQueryable;
     private List<ApplicationUser>? users;
     private string? errorMessage;
 
+    string emailFilter = string.Empty;
+    string roleFilter = string.Empty;
+
+    IQueryable<ApplicationUser> FilteredUsers
+    {
+        get
+        {
+            if (itemsQueryable == null)
+            {
+                return Enumerable.Empty<ApplicationUser>().AsQueryable();
+            }
+
+            var result = itemsQueryable;
+            if (!string.IsNullOrEmpty(emailFilter) && !string.IsNullOrEmpty(roleFilter))
+            {
+                result = result.Where(c => c.Email != null && c.Email.Contains(emailFilter, StringComparison.CurrentCultureIgnoreCase) && c.Role.Contains(roleFilter, StringComparison.CurrentCultureIgnoreCase));
+            }
+            else if (!string.IsNullOrEmpty(emailFilter))
+            {
+                result = result.Where(c => c.Email != null && c.Email.Contains(emailFilter, StringComparison.CurrentCultureIgnoreCase));
+            }
+            else if (!string.IsNullOrEmpty(roleFilter))
+            {
+                result = result.Where(c => c.Role.Contains(roleFilter, StringComparison.CurrentCultureIgnoreCase));
+            }
+
+            return result;
+        }
+    }
+
     protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine($"Base URI: {Navigation.BaseUri}");
+        await LoadUsers();
+    }
+
+    private async Task LoadUsers()
+    {
         try
         {
             users = await Http.GetFromJsonAsync<List<ApplicationUser>>($"{Navigation.BaseUri}api/User");
+            itemsQueryable = users?.AsQueryable();
         }
         catch (Exception ex)
         {
@@ -76,13 +118,12 @@ else
 
     private async Task ChangeRole(string userId)
     {
-        Console.WriteLine($"Changing role for user {userId}");
         try
         {
             var response = await Http.PostAsync($"{Navigation.BaseUri}api/User/ChangeRole/{userId}", null);
             if (response.IsSuccessStatusCode)
             {
-                users = await Http.GetFromJsonAsync<List<ApplicationUser>>($"{Navigation.BaseUri}api/User");
+                await LoadUsers();
             }
             else
             {
@@ -97,13 +138,12 @@ else
 
     private async Task AuthorizeUser(string userId)
     {
-        Console.WriteLine($"Authorizing user {userId}");
         try
         {
             var response = await Http.PostAsync($"{Navigation.BaseUri}api/User/Authorize/{userId}", null);
             if (response.IsSuccessStatusCode)
             {
-                users = await Http.GetFromJsonAsync<List<ApplicationUser>>($"{Navigation.BaseUri}api/User");
+                await LoadUsers();
             }
             else
             {
@@ -118,13 +158,12 @@ else
 
     private async Task DeauthorizeUser(string userId)
     {
-        Console.WriteLine($"Deauthorizing user {userId}");
         try
         {
             var response = await Http.PostAsync($"{Navigation.BaseUri}api/User/Deauthorize/{userId}", null);
             if (response.IsSuccessStatusCode)
             {
-                users = await Http.GetFromJsonAsync<List<ApplicationUser>>($"{Navigation.BaseUri}api/User");
+                await LoadUsers();
             }
             else
             {

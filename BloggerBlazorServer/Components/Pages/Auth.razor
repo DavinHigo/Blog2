@@ -20,6 +20,10 @@
 
     protected override async Task OnInitializedAsync()
     {
+        if (authenticationStateTask == null)
+        {
+            throw new InvalidOperationException("AuthenticationStateTask is null.");
+        }
         var authState = await authenticationStateTask;
         var user = authState.User;
 
@@ -75,7 +79,6 @@
                         </p>
                         <p>
                             @article.Body.Substring(0, Math.Min(100, article.Body.Length))...
-                            <a href="article-details/@article.ArticleId">Read More</a>
                         </p>
 
                         @if (article.ContributorUsername == userName || authContext.User.IsInRole("admin"))

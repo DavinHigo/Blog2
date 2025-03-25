@@ -19,6 +19,9 @@ builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuth
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ArticleService>();
 
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
+
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultScheme = IdentityConstants.ApplicationScheme;
@@ -108,7 +111,20 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
 
     var context = services.GetRequiredService<ApplicationDbContext>();
-    context.Database.Migrate();
+     try
+    {
+        // Apply migrations only if the database does not exist
+        if (!context.Database.CanConnect())
+        {
+            context.Database.Migrate();
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"An error occurred while migrating the database: {ex.Message}");
+    }
+
+    
 
     // Seed the user
     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();

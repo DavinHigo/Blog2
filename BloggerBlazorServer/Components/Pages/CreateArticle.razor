@@ -1,8 +1,10 @@
 ﻿@page "/create-article"
+@rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
 @using BloggerLibrary
 @using BloggerBlazorServer.Services
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Hosting.Server
 @attribute [Authorize]
 
 <PageTitle>Create Article</PageTitle>
@@ -21,13 +23,15 @@
     {
         var authState = await authenticationStateTask!;
         var currentUser = await UserService.GetCurrentUserAsync();
-        userName = await UserService.GetFullNameByEmailAsync(currentUser.Email);
+        userName = currentUser.Email != null 
+            ? await UserService.GetFullNameByEmailAsync(currentUser.Email) 
+            : "Unknown User";
 
         // Initialize with actual empty values instead of defaults
         newArticle = new Article
         {
-            Title = string.Empty,
-            Body = string.Empty,
+            Title ="Title",
+            Body = "body",
             ContributorUsername = userName,
             StartDate = DateTime.UtcNow,
             EndDate = DateTime.UtcNow

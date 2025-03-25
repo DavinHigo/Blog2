@@ -1,1 +1,108 @@
-﻿
+﻿@page "/edit-article/{id:int}"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using BloggerLibrary
+@using BloggerBlazorServer.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@attribute [Authorize]
+
+<PageTitle>Edit Article</PageTitle>
+
+@inject ArticleService ArticleService
+@inject NavigationManager Navigation
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Article? articleToEdit;
+    private bool isSubmitting = false;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            articleToEdit = await ArticleService.GetArticleByIdAsync(Id);
+            if (articleToEdit == null)
+            {
+                errorMessage = "Article not found.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        isSubmitting = true;
+
+        try
+        {
+            await ArticleService.UpdateArticleAsync(articleToEdit!);
+            Navigation.NavigateTo("/auth");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else if (articleToEdit != null)
+{
+    <EditForm Model="@articleToEdit" OnValidSubmit="@HandleValidSubmit" FormName="editArticleForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <InputText id="title" class="form-control" @bind-Value="@articleToEdit.Title" />
+            <ValidationMessage For="@(() => articleToEdit.Title)" />
+        </div>
+
+        <div class="mb-3">
+            <label for="body" class="form-label">Body</label>
+            <InputTextArea id="body" class="form-control" @bind-Value="@articleToEdit.Body" />
+            <ValidationMessage For="@(() => articleToEdit.Body)" />
+        </div>
+
+        <div class="mb-3">
+            <label for="startDate" class="form-label">Start Date</label>
+            <InputDate id="startDate" class="form-control" @bind-Value="@articleToEdit.StartDate" />
+            <ValidationMessage For="@(() => articleToEdit.StartDate)" />
+        </div>
+
+        <div class="mb-3">
+            <label for="endDate" class="form-label">End Date</label>
+            <InputDate id="endDate" class="form-control" @bind-Value="@articleToEdit.EndDate" />
+            <ValidationMessage For="@(() => articleToEdit.EndDate)" />
+        </div>
+
+        <div class="mb-3">
+            <label for="contributorUsername" class="form-label">Contributor Username</label>
+            <InputText id="contributorUsername" class="form-control" @bind-Value="@articleToEdit.ContributorUsername" readonly />
+        </div>
+
+        <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+            @if (isSubmitting)
+            {
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span class="visually-hidden">Loading...</span>
+            }
+            else
+            {
+                <span>Save Changes</span>
+            }
+        </button>
+    </EditForm>
+}
+
