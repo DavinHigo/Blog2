@@ -1,0 +1,58 @@
+.create-article-wrapper {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+.create-article-box {
+    background-color: white;
+    padding: 3rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 720px;
+    box-sizing: border-box;
+}
+
+h1, h2 {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 2rem;
+}
+
+.form-label {
+    font-weight: 500;
+}
+
+.mb-3 {
+    margin-bottom: 1.5rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.btn-primary {
+    display: block;
+    margin: 2rem auto 1rem auto;
+    padding: 0.5rem 1.5rem;
+    background-color: #007bff;
+    border: none;
+    border-radius: 0.25rem;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+.spinner-border {
+    margin-right: 0.5rem;
+}

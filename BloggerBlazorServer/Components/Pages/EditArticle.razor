@@ -59,50 +59,55 @@
 }
 else if (articleToEdit != null)
 {
-    <EditForm Model="@articleToEdit" OnValidSubmit="@HandleValidSubmit" FormName="editArticleForm">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
+    <div class="edit-article-wrapper">
+        <div class="edit-article-box">
+            <h1>Edit Article</h1>
+            <EditForm Model="@articleToEdit" OnValidSubmit="@HandleValidSubmit" FormName="editArticleForm">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
 
-        <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
-            <InputText id="title" class="form-control" @bind-Value="@articleToEdit.Title" />
-            <ValidationMessage For="@(() => articleToEdit.Title)" />
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title</label>
+                    <InputText id="title" class="form-control" @bind-Value="@articleToEdit.Title" />
+                    <ValidationMessage For="@(() => articleToEdit.Title)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="body" class="form-label">Body</label>
+                    <InputTextArea id="body" class="form-control" @bind-Value="@articleToEdit.Body" />
+                    <ValidationMessage For="@(() => articleToEdit.Body)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="startDate" class="form-label">Start Date</label>
+                    <InputDate id="startDate" class="form-control" @bind-Value="@articleToEdit.StartDate" />
+                    <ValidationMessage For="@(() => articleToEdit.StartDate)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="endDate" class="form-label">End Date</label>
+                    <InputDate id="endDate" class="form-control" @bind-Value="@articleToEdit.EndDate" />
+                    <ValidationMessage For="@(() => articleToEdit.EndDate)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="contributorUsername" class="form-label">Contributor Username</label>
+                    <InputText id="contributorUsername" class="form-control" @bind-Value="@articleToEdit.ContributorUsername" readonly />
+                </div>
+
+                <button type="submit" class="my-btn my-btn-primary submit-btn" disabled="@isSubmitting">
+                    @if (isSubmitting)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span class="visually-hidden">Loading...</span>
+                    }
+                    else
+                    {
+                        <span>Save Changes</span>
+                    }
+                </button>
+            </EditForm>
         </div>
-
-        <div class="mb-3">
-            <label for="body" class="form-label">Body</label>
-            <InputTextArea id="body" class="form-control" @bind-Value="@articleToEdit.Body" />
-            <ValidationMessage For="@(() => articleToEdit.Body)" />
-        </div>
-
-        <div class="mb-3">
-            <label for="startDate" class="form-label">Start Date</label>
-            <InputDate id="startDate" class="form-control" @bind-Value="@articleToEdit.StartDate" />
-            <ValidationMessage For="@(() => articleToEdit.StartDate)" />
-        </div>
-
-        <div class="mb-3">
-            <label for="endDate" class="form-label">End Date</label>
-            <InputDate id="endDate" class="form-control" @bind-Value="@articleToEdit.EndDate" />
-            <ValidationMessage For="@(() => articleToEdit.EndDate)" />
-        </div>
-
-        <div class="mb-3">
-            <label for="contributorUsername" class="form-label">Contributor Username</label>
-            <InputText id="contributorUsername" class="form-control" @bind-Value="@articleToEdit.ContributorUsername" readonly />
-        </div>
-
-        <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
-            @if (isSubmitting)
-            {
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                <span class="visually-hidden">Loading...</span>
-            }
-            else
-            {
-                <span>Save Changes</span>
-            }
-        </button>
-    </EditForm>
+    </div>
 }
 
