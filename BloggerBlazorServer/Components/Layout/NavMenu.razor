@@ -9,67 +9,34 @@
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
+<div class="top-row sticky-top shadow-sm">
+    <div class="container-fluid d-flex justify-content-between align-items-center flex-nowrap px-3">
         <a class="navbar-brand" href="">BloggerBlazorServer</a>
-    </div>
-</div>
+        <div class="nav-button-group d-flex align-items-center">
+            <NavLink href="/" class="my-btn my-btn-primary">Home</NavLink>
+            <NavLink href="/auth" class="my-btn my-btn-secondary">Auth Required</NavLink>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+            <AuthorizeView Roles="Admin">
+                <NavLink href="/admin" class="my-btn my-btn-warning">Admin Panel</NavLink>
+            </AuthorizeView>
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="auth">
-                <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Articles
-            </NavLink>
-        </div>
-
-        <AuthorizeView Roles="Admin">
-            <li class="nav-item px-3">
-                <NavLink class="nav-link" href="admin">
-                    <span class="oi oi-cog" aria-hidden="true"></span> Admin Panel
-                </NavLink>
-            </li>
-        </AuthorizeView>
-
-        <AuthorizeView>
-            <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Manage">
-                        <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> @userName
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <form action="Account/Logout" method="post">
+            <AuthorizeView>
+                <Authorized>
+                    <NavLink class="btn btn-outline-info me-2" href="Account/Manage">@userName</NavLink>
+                    <form action="Account/Logout" method="post" class="d-inline">
                         <AntiforgeryToken />
-                        <input type="hidden" name="ReturnUrl" value="Account/Login" />
-                        <button type="submit" class="nav-link">
-                            <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
-                        </button>
+                        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                        <button type="submit" class="my-btn my-btn-danger">Logout</button>
                     </form>
-                </div>
-            </Authorized>
-            <NotAuthorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Register">
-                        <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Login">
-                        <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Login
-                    </NavLink>
-                </div>
-            </NotAuthorized>
-        </AuthorizeView>
-    </nav>
+
+                </Authorized>
+                <NotAuthorized>
+                    <NavLink href="/Account/Register" class="my-btn my-btn-success">Register</NavLink>
+                    <NavLink href="/Account/Login" class="my-btn my-btn-primary">Login</NavLink>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+    </div>
 </div>
 
 @code {

@@ -13,42 +13,45 @@
 
 <PageTitle>Log in</PageTitle>
 
-<h1>Log in</h1>
-<div class="row">
-    <div class="col-lg-6">
+<div class="full-screen-center">
+    <div class="login-box">
         <section>
+            <h1>Log in</h1>
             <StatusMessage Message="@errorMessage" />
             <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
                 <DataAnnotationsValidator />
-                <h2>Use a local account to log in.</h2>
-                <hr />
                 <ValidationSummary class="text-danger" role="alert" />
+                
                 <div class="form-floating mb-3">
-                    <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                    <label for="Input.Email" class="form-label">Email</label>
+                    <label for="Input.Email">Email</label>
+                    <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" placeholder="name@example.com" autocomplete="username" />
                     <ValidationMessage For="() => Input.Email" class="text-danger" />
                 </div>
+
                 <div class="form-floating mb-3">
-                    <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label for="Input.Password" class="form-label">Password</label>
+                    <label for="Input.Password">Password</label>
+                    <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control" placeholder="password" autocomplete="current-password" />
                     <ValidationMessage For="() => Input.Password" class="text-danger" />
                 </div>
+
                 <div class="checkbox mb-3">
-                    <label class="form-label">
-                        <InputCheckbox @bind-Value="Input.RememberMe" class="darker-border-checkbox form-check-input" />
+                    <label>
+                        <InputCheckbox @bind-Value="Input.RememberMe" class="form-check-input" />
                         Remember me
                     </label>
                 </div>
+
                 <div>
-                    <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+                    <!-- 버튼 스타일 적용 -->
+                    <button type="submit" class="my-btn my-btn-primary login-btn">Log in</button>
                 </div>
+
                 <div>
-                    <p>
-                        <a href="Account/ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p>
-                        <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</a>
-                    </p>
+                    <!-- 회원가입 링크 오른쪽 정렬 -->
+                    <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))"
+                       class="register-link">
+                        Register as a new user
+                    </a>
                 </div>
             </EditForm>
         </section>
