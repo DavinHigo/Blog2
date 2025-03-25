@@ -45,6 +45,10 @@ namespace BloggerBlazorServer.Services
 
         public async Task CreateArticleAsync(Article article)
         {
+            if (article.StartDate >= article.EndDate)
+            {
+                throw new ArgumentException("StartDate must be earlier than EndDate.");
+            }
             article.CreateDate = DateTime.UtcNow;
             _context.Articles.Add(article);
             await _context.SaveChangesAsync();
@@ -55,6 +59,10 @@ namespace BloggerBlazorServer.Services
             var existingArticle = await _context.Articles.FirstOrDefaultAsync(a => a.ArticleId == article.ArticleId);
             if (existingArticle != null)
             {
+                if (article.StartDate >= article.EndDate)
+                {
+                    throw new ArgumentException("StartDate must be earlier than EndDate.");
+                }
                 existingArticle.Title = article.Title;
                 existingArticle.Body = article.Body;
                 existingArticle.StartDate = article.StartDate;

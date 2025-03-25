@@ -1,9 +1,9 @@
+using BloggerBlazorServer.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using BloggerBlazorServer.Components;
 using BloggerBlazorServer.Components.Account;
-using BloggerBlazorServer.Data;
 using BloggerBlazorServer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -76,8 +76,6 @@ builder.AddServiceDefaults();
 
 var app = builder.Build();
 
-
-
 app.UseCors("AllowAllOrigins");
 
 // Configure the HTTP request pipeline.
@@ -114,58 +112,10 @@ using (var scope = app.Services.CreateScope())
     // Seed the user
     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-    await SeedUserAsync(userManager, roleManager);
+    await DataSeeder.SeedUserAsync(userManager, roleManager);
+
+    // Seed the articles
+    await DataSeeder.SeedArticlesAsync(context);
 }
 
 app.Run();
-
-async Task SeedUserAsync(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
-{
-    var userId = "specific-user-id";
-    var user = await userManager.FindByIdAsync(userId);
-    if (user == null)
-    {
-        user = new ApplicationUser
-        {
-            Id = userId,
-            UserName = "a@a.a",
-            Email = "a@a.a",
-            FirstName = "Admin",
-            LastName = "User",
-            IsAuth = true,
-            Role = "Admin"
-        };
-        await userManager.CreateAsync(user, "P@$$w0rd");
-
-        if (!await roleManager.RoleExistsAsync("Admin"))
-        {
-            await roleManager.CreateAsync(new IdentityRole("Admin"));
-        }
-
-        await userManager.AddToRoleAsync(user, "Admin");
-    }
-
-    var contributorUserId = "specific-contributor-user-id";
-    var contributorUser = await userManager.FindByIdAsync(contributorUserId);
-    if (contributorUser == null)
-    {
-        contributorUser = new ApplicationUser
-        {
-            Id = contributorUserId,
-            UserName = "c@c.c",
-            Email = "c@c.c",
-            FirstName = "Contributor",
-            LastName = "User",
-            IsAuth = true,
-            Role = "Contributor"
-        };
-        await userManager.CreateAsync(contributorUser, "P@$$w0rd");
-
-        if (!await roleManager.RoleExistsAsync("Contributor"))
-        {
-            await roleManager.CreateAsync(new IdentityRole("Contributor"));
-        }
-
-        await userManager.AddToRoleAsync(contributorUser, "Contributor");
-    }
-}
