@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../SuperBlogger.ServiceDefaults/SuperBlogger.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\BloggerLibrary\BloggerLibrary.csproj" />
   </ItemGroup>
 
 </Project>

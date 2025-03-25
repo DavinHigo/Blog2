@@ -1,39 +1,82 @@
-var builder = WebApplication.CreateBuilder(args);
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using SuperBlogger.ApiService.Data;
+using SuperBlogger.ApiService.Services;
 
-// Add service defaults & Aspire components.
-builder.AddServiceDefaults();
+
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
 
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-app.UseExceptionHandler();
-
-var summaries = new[]
+// Retrieve the connection string from the environment variable or configuration file
+var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__blogdb");
+if (connectionString == null)
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    Console.WriteLine("Connection string 'blogdb' not found. Using default connection string.");
+    connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    if (connectionString == null)
+    {
+        throw new InvalidOperationException("Connection string not found.");
+    }
+}
 
-app.MapGet("/weatherforecast", () =>
+Console.WriteLine($"Connection string: {connectionString}");
+
+// Add DbContext 
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
+builder.Services.AddScoped<ArticleService>();
+
+
+builder.Services.AddCors(options =>
 {
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
+    options.AddPolicy("AllowAllOrigins",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
 });
 
-app.MapDefaultEndpoints();
+// Add MVC services
+builder.Services.AddControllers();
+
+// Add service defaults & Aspire components.
+builder.AddServiceDefaults();
+
+var app = builder.Build();
+
+app.UseCors("AllowAllOrigins");
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    var context = services.GetRequiredService<ApplicationDbContext>();
+    context.Database.Migrate();
+}
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

@@ -52,5 +52,12 @@ namespace BloggerBlazorServer.Controllers
             }
             return Ok();
         }
+
+        [HttpGet("CurrentUser")]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var user = await _userService.GetCurrentUserAsync();
+            return Ok(user);
+        }
     }
 }

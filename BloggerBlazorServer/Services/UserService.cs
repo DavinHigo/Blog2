@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+using BloggerLibrary;
 
 namespace BloggerBlazorServer.Services
 {
@@ -13,12 +16,14 @@ namespace BloggerBlazorServer.Services
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<UserService> _logger;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserService(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ILogger<UserService> logger)
+        public UserService(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ILogger<UserService> logger, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _userManager = userManager;
             _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<List<ApplicationUser>> GetUsersAsync()
@@ -38,9 +43,12 @@ namespace BloggerBlazorServer.Services
             var currentRole = user.Role;  // Get the current role of the user
             var newRole = string.Empty;
 
-            if (currentRole == "Admin") {
+            if (currentRole == "Admin")
+            {
                 newRole = "Contributor";
-            } else {
+            }
+            else
+            {
                 newRole = "Admin";
             }
 
@@ -57,7 +65,6 @@ namespace BloggerBlazorServer.Services
             return true;
         }
 
-
         public async Task<bool> AuthorizeUserAsync(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -71,6 +78,37 @@ namespace BloggerBlazorServer.Services
             await _context.SaveChangesAsync();
             _logger.LogInformation("Authorized user {UserId}", userId);
             return true;
+        }
+
+        public async Task<ApplicationUser> GetCurrentUserAsync()
+        {
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext == null)
+            {
+                throw new InvalidOperationException("HttpContext is null.");
+            }
+
+            var user = await _userManager.GetUserAsync(httpContext.User);
+            if (user == null)
+            {
+                throw new KeyNotFoundException("User not found.");
+            }
+            return user;
+        }
+
+        public async Task<string> GetFullNameByEmailAsync(string email)
+        {
+            var user = await _context.Users
+                .Where(u => u.Email == email)
+                .Select(u => new { u.FirstName, u.LastName })
+                .FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                throw new KeyNotFoundException("User not found.");
+            }
+
+            return $"{user.FirstName} {user.LastName}";
         }
     }
 }

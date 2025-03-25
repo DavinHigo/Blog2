@@ -1,4 +1,7 @@
 ﻿@using BloggerBlazorServer.Components.Account.Shared
+@using BloggerBlazorServer.Components.Account.Pages
+@using BloggerBlazorServer.Components
+
 <Router AppAssembly="typeof(Program).Assembly">
     <Found Context="routeData">
         <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">

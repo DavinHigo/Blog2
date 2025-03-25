@@ -1,0 +1,98 @@
+﻿@page "/create-article"
+@using Microsoft.AspNetCore.Authorization
+@using BloggerLibrary
+@using BloggerBlazorServer.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@attribute [Authorize]
+
+<PageTitle>Create Article</PageTitle>
+
+@inject ArticleService ArticleService
+@inject UserService UserService
+@inject NavigationManager Navigation
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? authenticationStateTask { get; set; }
+    private Article newArticle = new();
+    private string? userName;
+    private bool isSubmitting = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationStateTask!;
+        var currentUser = await UserService.GetCurrentUserAsync();
+        userName = await UserService.GetFullNameByEmailAsync(currentUser.Email);
+
+        // Initialize with actual empty values instead of defaults
+        newArticle = new Article
+        {
+            Title = string.Empty,
+            Body = string.Empty,
+            ContributorUsername = userName,
+            StartDate = DateTime.UtcNow,
+            EndDate = DateTime.UtcNow
+        };
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        isSubmitting = true;
+        
+        try
+        {
+            newArticle.CreateDate = DateTime.UtcNow;
+            await ArticleService.CreateArticleAsync(newArticle);
+            Navigation.NavigateTo("/auth");
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}
+
+<EditForm Model="@newArticle" OnValidSubmit="@HandleValidSubmit" FormName="createArticleForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <InputText id="title" class="form-control" @bind-Value="@newArticle.Title" />
+        <ValidationMessage For="@(() => newArticle.Title)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="body" class="form-label">Body</label>
+        <InputTextArea id="body" class="form-control" @bind-Value="@newArticle.Body" />
+        <ValidationMessage For="@(() => newArticle.Body)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="startDate" class="form-label">Start Date</label>
+        <InputDate id="startDate" class="form-control" @bind-Value="@newArticle.StartDate" />
+        <ValidationMessage For="@(() => newArticle.StartDate)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="endDate" class="form-label">End Date</label>
+        <InputDate id="endDate" class="form-control" @bind-Value="@newArticle.EndDate" />
+        <ValidationMessage For="@(() => newArticle.EndDate)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="contributorUsername" class="form-label">Contributor Username</label>
+        <InputText id="contributorUsername" class="form-control" @bind-Value="@newArticle.ContributorUsername" readonly />
+    </div>
+
+    <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+        @if (isSubmitting)
+        {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span class="visually-hidden">Loading...</span>
+        }
+        else
+        {
+            <span>Submit</span>
+        }
+    </button>
+</EditForm>

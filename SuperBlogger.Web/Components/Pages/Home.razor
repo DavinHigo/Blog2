@@ -1,7 +1,43 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+@using System.Net.Http
+@using System.Net.Http.Json
+@using BloggerLibrary
+@inject ArticlesApiClient ArticlesApiClient
+@inject NavigationManager Navigation
 
-<h1>Hello, world!</h1>
+<PageTitle>SuperBlogger Blogs</PageTitle>
 
-Welcome to your new app.
+<h1>SuperBlogger Blogs</h1>
+
+@if (articles == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (!articles.Any())
+{
+    <p>No articles available.</p>
+}
+else
+{
+    <ul>
+        @foreach (var article in articles)
+        {
+            <li>
+                <h2>@article.Title</h2>
+                <p><strong>By:</strong> @article.ContributorUsername</p>
+                <p><strong>Start Date:</strong> @article.StartDate.ToShortDateString()</p>
+                <p>@article.Body.Substring(0, Math.Min(100, article.Body.Length))... <a href="@($"/details/{article.ArticleId}")">more...</a></p>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private List<Article>? articles;
+
+    protected override async Task OnInitializedAsync()
+    {
+        articles = await ArticlesApiClient.GetAllActiveArticlesAsync();
+    }
+}

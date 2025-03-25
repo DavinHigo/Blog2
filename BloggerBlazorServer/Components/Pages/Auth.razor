@@ -1,13 +1,98 @@
 ﻿@page "/auth"
 
 @using Microsoft.AspNetCore.Authorization
+@using BloggerLibrary
+@using BloggerBlazorServer.Services
+@using Microsoft.AspNetCore.Components.Authorization
 
 @attribute [Authorize]
 
 <PageTitle>Auth</PageTitle>
 
+@inject ArticleService ArticleService
+@inject UserService UserService
+@inject NavigationManager Navigation
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? authenticationStateTask { get; set; }
+    private IEnumerable<Article>? articles;
+    private string? userName;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+
+        // Get the current user's email
+        var currentUser = await UserService.GetCurrentUserAsync();
+        if (currentUser?.Email != null)
+        {
+            // Use the GetFullNameByEmailAsync method to get the full name
+            userName = await UserService.GetFullNameByEmailAsync(currentUser.Email);
+
+            // Fetch articles by the current user's username
+            if (userName != null)
+            {
+                articles = await ArticleService.GetArticlesByContributorAsync(userName);
+            }
+        }
+    }
+
+    private async Task DeleteArticle(int articleId)
+    {
+        await ArticleService.DeleteArticleAsync(articleId);
+        if (userName != null)
+        {
+            articles = await ArticleService.GetArticlesByContributorAsync(userName);
+        }
+    }
+}
+
 <h1>You are authenticated</h1>
 
 <AuthorizeView>
-    Hello @context.User.Identity?.Name!
+    <Authorized Context="authContext">
+        Hello @userName!
+
+        <h2>Articles</h2>
+
+        <a href="/create-article" class="btn btn-primary mb-3">Create New Article</a>
+
+        @if (articles == null || !articles.Any())
+        {
+            <p>No articles are currently available.</p>
+        }
+        else
+        {
+            <div class="list-group">
+                @foreach (var article in articles)
+                {
+                    <div class="list-group-item mb-3">
+                        <h4>@article.Title</h4>
+                        <p>
+                            <strong>@article.ContributorUsername</strong>,
+                            @article.CreateDate.ToString("MMMM dd, yyyy")
+                        </p>
+                        <p>
+                            @article.Body.Substring(0, Math.Min(100, article.Body.Length))...
+                            <a href="article-details/@article.ArticleId">Read More</a>
+                        </p>
+
+                        @if (article.ContributorUsername == userName || authContext.User.IsInRole("admin"))
+                        {
+                            <div class="mt-2">
+                                <a href="edit-article/@article.ArticleId" class="btn btn-sm btn-warning">Edit</a>
+                                <EditForm EditContext="new EditContext(article)" OnValidSubmit="() => DeleteArticle(article.ArticleId)" FormName=@($"DeleteArticleForm_{article.ArticleId}")>
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </EditForm>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p>You are not authorized to view this content.</p>
+    </NotAuthorized>
 </AuthorizeView>
