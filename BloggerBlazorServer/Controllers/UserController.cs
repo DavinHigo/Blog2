@@ -53,6 +53,17 @@ namespace BloggerBlazorServer.Controllers
             return Ok();
         }
 
+        [HttpPost("Deauthorize/{userId}")]
+        public async Task<IActionResult> DeauthorizeUser(string userId)
+        {
+            var result = await _userService.DeauthorizeUserAsync(userId);
+            if (!result)
+            {
+                return BadRequest("Failed to deauthorize user.");
+            }
+            return Ok();
+        }
+
         [HttpGet("CurrentUser")]
         public async Task<IActionResult> GetCurrentUser()
         {

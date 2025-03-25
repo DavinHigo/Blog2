@@ -40,24 +40,35 @@ namespace BloggerBlazorServer.Services
                 return false;
             }
 
-            var currentRole = user.Role;  // Get the current role of the user
-            var newRole = string.Empty;
+            var currentRoles = await _userManager.GetRolesAsync(user);
+            var currentRole = currentRoles.FirstOrDefault(); // Assuming the user has only one role
+            var newRole = currentRole == "Admin" ? "Contributor" : "Admin";
 
-            if (currentRole == "Admin")
+            // Remove the current role
+            if (!string.IsNullOrEmpty(currentRole))
             {
-                newRole = "Contributor";
-            }
-            else
-            {
-                newRole = "Admin";
+                var removeResult = await _userManager.RemoveFromRoleAsync(user, currentRole);
+                if (!removeResult.Succeeded)
+                {
+                    _logger.LogError("Failed to remove role {Role} for user {UserId}", currentRole, userId);
+                    return false;
+                }
             }
 
+            // Add the new role
+            var addResult = await _userManager.AddToRoleAsync(user, newRole);
+            if (!addResult.Succeeded)
+            {
+                _logger.LogError("Failed to add role {Role} for user {UserId}", newRole, userId);
+                return false;
+            }
+
+            // Update the user's Role property (if applicable)
             user.Role = newRole;
-
             var updateResult = await _userManager.UpdateAsync(user);
             if (!updateResult.Succeeded)
             {
-                _logger.LogError("Failed to update role for user {UserId}", userId);
+                _logger.LogError("Failed to update user {UserId} after role change", userId);
                 return false;
             }
 
@@ -77,6 +88,21 @@ namespace BloggerBlazorServer.Services
             user.IsAuth = true;
             await _context.SaveChangesAsync();
             _logger.LogInformation("Authorized user {UserId}", userId);
+            return true;
+        }
+
+        public async Task<bool> DeauthorizeUserAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                _logger.LogWarning("User not found: {UserId}", userId);
+                return false;
+            }
+
+            user.IsAuth = false;
+            await _context.SaveChangesAsync();
+            _logger.LogInformation("Deauthorized user {UserId}", userId);
             return true;
         }
 

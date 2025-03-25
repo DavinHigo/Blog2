@@ -44,6 +44,12 @@ else
                                 <button type="submit" class="btn btn-success">Authorize</button>
                             </EditForm>
                         }
+                        else
+                        {
+                            <EditForm EditContext="new EditContext(user)" OnValidSubmit="() => DeauthorizeUser(user.Id)" FormName=@($"DeauthorizeUserForm_{user.Id}")>
+                                <button type="submit" class="btn btn-danger">Deauthorize</button>
+                            </EditForm>
+                        }
                     </td>
                 </tr>
             }
@@ -102,6 +108,27 @@ else
             else
             {
                 errorMessage = "Failed to authorize user.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    private async Task DeauthorizeUser(string userId)
+    {
+        Console.WriteLine($"Deauthorizing user {userId}");
+        try
+        {
+            var response = await Http.PostAsync($"{Navigation.BaseUri}api/User/Deauthorize/{userId}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                users = await Http.GetFromJsonAsync<List<ApplicationUser>>($"{Navigation.BaseUri}api/User");
+            }
+            else
+            {
+                errorMessage = "Failed to deauthorize user.";
             }
         }
         catch (Exception ex)
