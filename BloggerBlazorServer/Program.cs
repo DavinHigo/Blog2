@@ -111,20 +111,14 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
 
     var context = services.GetRequiredService<ApplicationDbContext>();
-     try
+    try
     {
-        // Apply migrations only if the database does not exist
-        if (!context.Database.CanConnect())
-        {
-            context.Database.Migrate();
-        }
+        context.Database.Migrate();
     }
     catch (Exception ex)
     {
         Console.WriteLine($"An error occurred while migrating the database: {ex.Message}");
     }
-
-    
 
     // Seed the user
     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();

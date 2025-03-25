@@ -3,6 +3,7 @@
 @using BloggerLibrary
 @inject ArticlesApiClient ArticlesApiClient
 @inject NavigationManager Navigation
+@rendermode InteractiveServer
 
 <h3>Article Details</h3>
 
@@ -18,6 +19,9 @@ else
     <p>@article.Body</p>
 }
 
+<button @onclick="NavigateToHome" class="btn btn-secondary">Back to Home</button>
+
+
 @code {
     [Parameter]
     public int Id { get; set; }
@@ -27,5 +31,10 @@ else
     protected override async Task OnInitializedAsync()
     {
         article = await ArticlesApiClient.GetArticleByIdAsync(Id);
+    }
+
+    private void NavigateToHome()
+    {
+        Navigation.NavigateTo("/");
     }
 }

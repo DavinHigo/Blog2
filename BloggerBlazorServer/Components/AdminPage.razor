@@ -4,8 +4,10 @@
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.QuickGrid
+@attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Admin Page</PageTitle>
 
