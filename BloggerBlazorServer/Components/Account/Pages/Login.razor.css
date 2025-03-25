@@ -1,31 +1,34 @@
-.login-page-wrapper {
-    height: 100vh;                 /* 🔥 핵심: 화면 전체 높이 */
-    width: 100vw;                  /* 넓이도 명시하면 더 확실 */
+/* 페이지 전체 가운데 정렬 */
+.full-screen-center {
+    position: fixed;
+    inset: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #0e7ae6;
+    background-color: #f8f9fa;
     overflow: hidden;
 }
 
-
+/* 로그인 박스 */
 .login-box {
     background-color: white;
     padding: 3rem;
-    border-radius: 0.5rem
+    border-radius: 0.5rem;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 720px;
+    box-sizing: border-box;
 }
 
+/* 제목 스타일 */
 h1 {
     text-align: center;
     font-weight: bold;
     font-size: 2.2rem;
-    margin-bottom: 2rem;
+    margin: 0 0 2rem 0; /* 위 여백 제거해서 완전 정중앙 정렬 */
 }
 
-section {
-    text-align: center;
-}
-
+/* 입력 필드 컨테이너 */
 .form-floating {
     margin: 0 auto 1.5rem auto;
     max-width: 500px;
@@ -33,16 +36,14 @@ section {
     text-align: left;
 }
 
-.checkbox {
-    text-align: center;
-}
-
+/* 로그인 버튼 */
 .login-btn {
     display: block;
     margin: 2rem auto 1rem auto;
     width: 200px;
 }
 
+/* 회원가입 링크 */
 .register-link {
     display: block;
     text-align: right;
@@ -51,13 +52,11 @@ section {
     font-weight: 500;
     margin-right: 5px;
 }
-
 .register-link:hover {
     text-decoration: underline;
 }
 
-
-
+/* 커스텀 버튼 스타일 */
 .my-btn {
     padding: 0.5rem 1rem;
     font-size: 1rem;
@@ -74,7 +73,12 @@ section {
     background-color: #007bff;
     color: white;
 }
-
 .my-btn-primary:hover {
     background-color: #0056b3;
+}
+.login-btn {
+    display: block;
+    margin: 2rem auto;   /* 좌우 auto → 수평 가운데 정렬 */
+    width: 200px;
+    text-align: center;  /* 텍스트도 가운데 정렬 (백업용) */
 }

@@ -1,0 +1,67 @@
+.register-page-wrapper {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
+    overflow: hidden;
+}
+
+.register-box {
+    background-color: white;
+    padding: 3rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 720px;
+    box-sizing: border-box;
+}
+
+
+h1 {
+    text-align: center;
+    font-weight: bold;
+    font-size: 2.2rem;
+    margin-bottom: 2rem;
+}
+
+.form-floating {
+    margin: 0 auto 1.5rem auto;
+    max-width: 500px;
+    width: 100%;
+    text-align: left;
+}
+
+.register-btn {
+    display: block;
+    margin: 2rem auto 1rem auto;
+    width: 200px;
+}
+
+.my-btn {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-align: center;
+    display: inline-block;
+}
+
+.my-btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.my-btn-primary:hover {
+    background-color: #0056b3;
+}
+.register-btn {
+    display: block;
+    margin: 2rem auto;   /* 좌우 auto → 수평 가운데 정렬 */
+    width: 200px;
+    text-align: center;  /* 텍스트도 가운데 정렬 (백업용) */
+}
