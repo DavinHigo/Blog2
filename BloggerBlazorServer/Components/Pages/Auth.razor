@@ -4,6 +4,8 @@
 @using BloggerLibrary
 @using BloggerBlazorServer.Services
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.QuickGrid
+@rendermode InteractiveServer
 
 @attribute [Authorize]
 
@@ -17,6 +19,9 @@
     [CascadingParameter] private Task<AuthenticationState>? authenticationStateTask { get; set; }
     private IEnumerable<Article>? articles;
     private string? userName;
+    private PaginationState pagination = new() { ItemsPerPage = 10 };
+    private IQueryable<Article>? itemsQueryable;
+    private string? titleFilter;
 
     protected override async Task OnInitializedAsync()
     {
@@ -38,6 +43,7 @@
             if (userName != null)
             {
                 articles = await ArticleService.GetArticlesByContributorAsync(userName);
+                itemsQueryable = articles?.AsQueryable();
             }
         }
     }
@@ -48,6 +54,26 @@
         if (userName != null)
         {
             articles = await ArticleService.GetArticlesByContributorAsync(userName);
+            itemsQueryable = articles?.AsQueryable();
+        }
+    }
+
+    IQueryable<Article> FilteredArticles
+    {
+        get
+        {
+            if (itemsQueryable == null)
+            {
+                return Enumerable.Empty<Article>().AsQueryable();
+            }
+
+            var result = itemsQueryable;
+            if (!string.IsNullOrEmpty(titleFilter))
+            {
+                result = result.Where(a => a.Title.Contains(titleFilter, StringComparison.CurrentCultureIgnoreCase));
+            }
+
+            return result;
         }
     }
 }
@@ -62,37 +88,41 @@
 
         <a href="/create-article" class="btn btn-primary mb-3">Create New Article</a>
 
-        @if (articles == null || !articles.Any())
+        @if (itemsQueryable == null || !itemsQueryable.Any())
         {
             <p>No articles are currently available.</p>
         }
         else
         {
-            <div class="list-group">
-                @foreach (var article in articles)
-                {
-                    <div class="list-group-item mb-3">
-                        <h4>@article.Title</h4>
-                        <p>
-                            <strong>@article.ContributorUsername</strong>,
-                            @article.CreateDate.ToString("MMMM dd, yyyy")
-                        </p>
-                        <p>
-                            @article.Body.Substring(0, Math.Min(100, article.Body.Length))...
-                        </p>
-
-                        @if (article.ContributorUsername == userName || authContext.User.IsInRole("admin"))
-                        {
-                            <div class="mt-2">
-                                <a href="edit-article/@article.ArticleId" class="btn btn-sm btn-warning">Edit</a>
-                                <EditForm EditContext="new EditContext(article)" OnValidSubmit="() => DeleteArticle(article.ArticleId)" FormName=@($"DeleteArticleForm_{article.ArticleId}")>
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                </EditForm>
-                            </div>
-                        }
-                    </div>
-                }
+            <div class="page-size-chooser mb-3">
+                Items per page:
+                <select @bind="@pagination.ItemsPerPage">
+                    <option>5</option>
+                    <option>10</option>
+                    <option>20</option>
+                    <option>50</option>
+                </select>
             </div>
+
+            <QuickGrid Items="@FilteredArticles" Pagination="@pagination" class="table">
+                <PropertyColumn Property="@(a => a.Title)" Sortable="true">
+                    <ColumnOptions>
+                        <div class="search-box">
+                            <input type="search" @bind="titleFilter" @bind:event="oninput" placeholder="Search titles..." />
+                        </div>
+                    </ColumnOptions>
+                </PropertyColumn>
+                <PropertyColumn Property="@(a => a.CreateDate)" Format="yyyy-MM-dd" Sortable="true" />
+                <PropertyColumn Property="@(a => a.ContributorUsername)" Sortable="true" />
+                <TemplateColumn>
+                    <div class="btn-group">
+                        <a href="edit-article/@context.ArticleId" class="btn btn-sm btn-warning">Edit</a>
+                        <button @onclick="@(() => DeleteArticle(context.ArticleId))" class="btn btn-sm btn-danger">Delete</button>
+                    </div>
+                </TemplateColumn>
+            </QuickGrid>
+
+            <Paginator State="@pagination" />
         }
     </Authorized>
     <NotAuthorized>
