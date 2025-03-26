@@ -15,8 +15,8 @@ builder.Services.AddOutputCache();
 // Configure HttpClient to use the API service URLs
 builder.Services.AddHttpClient<ArticlesApiClient>(client =>
 {
-    // client.BaseAddress = new Uri("https://localhost:7478"); // Apphost
-    client.BaseAddress = new Uri("http://localhost:5487"); // Localhost
+    client.BaseAddress = new Uri("https://localhost:7478"); // Apphost
+    // client.BaseAddress = new Uri("http://localhost:5487"); // Localhost
 });
 
 var app = builder.Build();
