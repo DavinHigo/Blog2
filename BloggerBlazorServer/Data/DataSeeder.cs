@@ -18,8 +18,8 @@ namespace BloggerBlazorServer.Data
                     Id = userId,
                     UserName = "a@a.a",
                     Email = "a@a.a",
-                    FirstName = "Admin",
-                    LastName = "User",
+                    FirstName = "HI",
+                    LastName = "THERE",
                     IsAuth = true,
                     Role = "Admin"
                 };
@@ -42,8 +42,8 @@ namespace BloggerBlazorServer.Data
                     Id = contributorUserId,
                     UserName = "c@c.c",
                     Email = "c@c.c",
-                    FirstName = "Contributor",
-                    LastName = "User",
+                    FirstName = "CONG",
+                    LastName = "KING",
                     IsAuth = true,
                     Role = "Contributor"
                 };
